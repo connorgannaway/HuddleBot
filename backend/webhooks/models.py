@@ -1,22 +1,33 @@
 from django.db import models
-from django.utils import timezone, dateformat
+from django.utils import timezone
 from check_in.models import Person
+from django.utils.translation import gettext_lazy as _
+
+'''
+This file defines database tables for the Django ORM. Each class is a table, with variables being columns.
+PK is automatically included.
+
+___str___ returns the title of an instance, instead of titles being: <Object 1>
+'''
 
 class ticket_assignment(models.Model):
     assigned_at = models.DateTimeField(default=timezone.now)
-    assigned_to = models.ForeignKey(Person, on_delete=models.SET_NULL, blank=True, null=True)
     jira_issue_key = models.CharField(max_length=24)
+
+    #sets to null if reference is deleted
+    assigned_to = models.ForeignKey(Person, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return self.jira_issue_key
 
 class ticket_status_changes(models.Model):
 
+    #status choices enum
     class Status(models.TextChoices):
-        TO_DO = "To Do"
-        IN_PROGRESS = "In Progress"
-        TESTING = "Testing"
-        DONE = "DONE"
+        TO_DO = "to_do", _("To Do")
+        IN_PROGRESS = "in_progress", _("In Progress")
+        TESTING = "testing", _("Testing")
+        DONE = "done", _("Done")
 
     updated_at = models.DateTimeField(default=timezone.now)
     jira_issue_key = models.CharField(max_length=24)
