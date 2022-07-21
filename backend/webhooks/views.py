@@ -3,15 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import *
 
-
-class StatusChange(APIView):
-    
-    #returns all statuschange entries
-    def get(self, request, format=None):
-        objects = ticket_status_changes.objects.all()
-        serializer = ticket_status_changes_serializer(objects, many=True)
-
-        return Response(serializer.data)
+class StatusChangeView(APIView):
 
     #saves a statuschange entry to db
     def post(self, request, format=None):
@@ -34,15 +26,19 @@ class StatusChange(APIView):
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
-class Assignment(APIView):
-
-    #returns all assignment entries
+    
+    ''' GET METHOD DISALLOWED
+    #returns all statuschange entries
     def get(self, request, format=None):
-        objects = ticket_assignment.objects.all()
-        serializer = ticket_assignment_serializer(objects, many=True)
+        objects = ticket_status_changes.objects.all()
+        serializer = ticket_status_changes_serializer(objects, many=True)
 
         return Response(serializer.data)
+    '''
+  
+
+
+class AssignmentView(APIView):
 
     #saves an assignment entry to db
     def post(self, request, format=None):
@@ -73,3 +69,12 @@ class Assignment(APIView):
             serializer.save()
             return Response(status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    '''GET METHOD DISALLOWED
+    #returns all assignment entries
+    def get(self, request, format=None):
+        objects = ticket_assignment.objects.all()
+        serializer = ticket_assignment_serializer(objects, many=True)
+
+        return Response(serializer.data)
+    '''
