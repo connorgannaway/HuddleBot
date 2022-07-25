@@ -31,3 +31,16 @@ class ticket_status_changes_serializer(serializers.ModelSerializer):
             'description',
         ]
         
+class api_token_serializer(serializers.ModelSerializer):
+    class Meta:
+        model = api_token
+        fields = [
+            'pk',
+            'token_type',
+            'token',
+            'refresh_token',
+            'updated_at',
+        ]
+        extra_kwargs = {
+            "refresh_token": {"required": False}
+        }

@@ -8,6 +8,10 @@
   font-weight: normal;
 }
 
+body {
+  background: #eee;
+}
+
 a,
 .green {
   text-decoration: none;

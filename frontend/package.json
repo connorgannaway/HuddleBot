@@ -7,6 +7,8 @@
     "preview": "vite preview --port 4173"
   },
   "dependencies": {
+    "@slack/web-api": "^6.7.2",
+    "axios": "^0.27.2",
     "vue": "^3.2.37"
   },
   "devDependencies": {

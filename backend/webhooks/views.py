@@ -2,6 +2,9 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import *
+from django.utils import timezone
+import os
+import requests
 
 class StatusChangeView(APIView):
 
@@ -78,3 +81,51 @@ class AssignmentView(APIView):
 
         return Response(serializer.data)
     '''
+
+class TokenView(APIView):
+
+    def refreshOauthToken(self, refresh_token):
+        print("REFRESHING OAUTH TOKEN")
+        headers = {'Content_Type': 'application/json'}
+        data = {
+            'grant_type': 'refresh_token',
+            'client_id': os.environ.get('JIRA_CLIENT'),
+            'client_secret': os.environ.get('JIRA_SECRET'),
+            'refresh_token': refresh_token,
+        }
+
+        res = requests.post('https://auth.atlassian.com/oauth/token',
+            data=data,
+            headers=headers)
+        data = {
+            'token_type': 'jira',
+            'token': res.json()['access_token'],
+            'refresh_token': res.json()['refresh_token']
+        }
+        newtoken = api_token(**data)
+        newtoken.save()
+        return data['token']
+
+    def get(self, request, format=None):
+        try:
+            if(request.query_params['type'] == "slack"):
+                obj = api_token.objects.filter(token_type="slack").order_by('-updated_at').first()
+                data = {
+                    "token": obj.token
+                }
+                return Response(data=data, status=status.HTTP_200_OK)
+
+            elif(request.query_params['type'] == "jira"):
+                obj = api_token.objects.filter(token_type="jira").order_by('-updated_at').first()
+                token = obj.token
+                delta = timezone.now() - obj.updated_at
+                if((delta.total_seconds() / 3600) >= 1.0):
+                    #refresh token
+                    token = self.refreshOauthToken(obj.refresh_token)
+
+                data = {
+                    "token": token
+                }
+                return Response(data=data, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
