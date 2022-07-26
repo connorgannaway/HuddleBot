@@ -13,6 +13,7 @@ class Person_Serializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'slack_id',
+            'jira_id',
             'is_active',
             'start_date',
             'end_date',

@@ -10,22 +10,37 @@
     const end_date = ref()
     const is_active = ref(true)
     let slack_token = ''
-    const matchFound = ref(false)
-    const attemptMatch = ref(false)
+    let jira_token = ''
+    const slackmatchFound = ref(false)
+    const slackattemptMatch = ref(false)
+    const jiramatchFound = ref(false)
+    const jiraattemptMatch = ref(false)
+    const postCode = ref()
 
     
-    async function getSlackToken(){
+    function getTokens(){
         axios.get(
-            'http://localhost:8000/api/token/?type=slack'
-        ).then((res) => {
+            'http://localhost:8000/api/token/?service=slack'
+        )
+        .then((res) => {
             slack_token = res.data.token
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+
+        axios.get(
+            'http://localhost:8000/api/token/?service=jira'
+        )
+        .then((res) => {
+            jira_token = res.data.token
         })
         .catch((err) => {
             console.log(err)
         })
     }
 
-    function postTest(e){
+    function findSlackMatch(e){
         e.preventDefault()
 
         const body = `token=${slack_token}`
@@ -36,21 +51,77 @@
             for(const member of members){
                 if(member.real_name == `${first_name.value} ${last_name.value}`){
                     slack_id.value = member.id
-                    matchFound.value = true
+                    slackmatchFound.value = true
                 }
-                
             }
-            attemptMatch.value = true
-
+            slackattemptMatch.value = true
         })
         .catch((err) => {
             console.log(err)
         })
     }
+
+    function findJiraMatch(e){
+        e.preventDefault()
+        let config = {
+            params: {
+                maxResults: 200
+            },
+            headers: {
+                Authorization : `Bearer ${jira_token}`
+            }
+        }
+
+        axios.get(
+            'https://api.atlassian.com/ex/jira/473bc873-16c1-44d7-9376-97e8de5e755c/rest/api/3/users/search',
+            config
+        )
+        .then((res) => {
+            for(const user of res.data){
+                if(user.displayName == `${first_name.value} ${last_name.value}`){
+                    jiramatchFound.value = true
+                    jira_id.value = user.accountId
+                }
+            }
+            jiraattemptMatch.value = true
+        })
+    }
+
+    function sumbitForm(e){
+        e.preventDefault()
+        console.log(end_date.value)
+        if(end_date.value == ''){
+            end_date.value = null
+        }
+        
+        let params = {
+            first_name: first_name.value,
+            last_name: last_name.value,
+            slack_id: slack_id.value,
+            jira_id: jira_id.value,
+            start_date: start_date.value,
+            end_date: end_date.value,
+            is_active: is_active.value
+        }
+    
+
+        axios.post(
+            'http://localhost:8000/api/person/',
+            params
+        )
+        .then((res) => {
+            console.log(res)
+            postCode.value = res.status
+        })
+        .catch((err) => {
+            console.log(err)
+            postCode.value = err.response.status
+        })
+    }
     
     
     (() => {
-        getSlackToken()
+        getTokens()
     })()
 
 </script>
@@ -67,13 +138,17 @@
         <label>Last Name</label>
         <input v-model="last_name" />
         <label>Slack ID - 
-            <button @click="postTest">Search</button> 
-            <p v-if="matchFound && attemptMatch" class="success">Match Found</p> 
-            <p v-if="attemptMatch && !matchFound" class="error">No Match Found</p>
+            <button @click="findSlackMatch">Search</button> 
+            <p v-if="slackmatchFound && slackattemptMatch" class="success">Match Found</p> 
+            <p v-if="slackattemptMatch && !slackmatchFound" class="error">No Match Found</p>
         </label>
         <input v-model="slack_id" />
 
-        <label>Jira ID</label>
+        <label>Jira ID
+            <button @click="findJiraMatch">Search</button> 
+            <p v-if="jiramatchFound && jiraattemptMatch" class="success">Match Found</p> 
+            <p v-if="jiraattemptMatch && !jiramatchFound" class="error">No Match Found</p>
+        </label>
         <input v-model="jira_id" />
 
         <label>Start Date</label>
@@ -84,6 +159,9 @@
 
         <label>Active</label>
         <input type="checkbox" v-model="is_active" />
+        <button @click="sumbitForm">Submit</button>
+        <p v-if="postCode == 201" class="success">Object Created</p>
+        <p v-if="postCode == 400" class="error">Error. (Make sure Slack/Jira ID fields are unique!)</p>
     </form>
 
 </template>

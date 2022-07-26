@@ -6,6 +6,7 @@ from .serializers import *
 class PersonView(APIView):
 
     def post(self, request, format=None):
+        #print(request.data)
         serializer = Person_Serializer(data=request.data)
         if(serializer.is_valid()):
             serializer.save()

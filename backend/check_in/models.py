@@ -12,8 +12,8 @@ ___str___ returns the title of an instance, instead of titles being: <Object 1>
 class Person(models.Model):
     first_name = models.CharField(max_length=24)
     last_name = models.CharField(max_length=24)
-    slack_id = models.CharField(max_length=24)
-    jira_id = models.CharField(max_length=24)
+    slack_id = models.CharField(max_length=24, unique=True)
+    jira_id = models.CharField(max_length=24, unique=True)
     is_active = models.BooleanField(default=True)
     start_date = models.DateField()
     end_date = models.DateField(blank=True, null=True)

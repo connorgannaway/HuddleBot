@@ -98,7 +98,7 @@ class TokenView(APIView):
             data=data,
             headers=headers)
         data = {
-            'token_type': 'jira',
+            'service': 'jira',
             'token': res.json()['access_token'],
             'refresh_token': res.json()['refresh_token']
         }
@@ -108,15 +108,15 @@ class TokenView(APIView):
 
     def get(self, request, format=None):
         try:
-            if(request.query_params['type'] == "slack"):
-                obj = api_token.objects.filter(token_type="slack").order_by('-updated_at').first()
+            if(request.query_params['service'] == "slack"):
+                obj = api_token.objects.filter(service="slack").order_by('-updated_at').first()
                 data = {
                     "token": obj.token
                 }
                 return Response(data=data, status=status.HTTP_200_OK)
 
-            elif(request.query_params['type'] == "jira"):
-                obj = api_token.objects.filter(token_type="jira").order_by('-updated_at').first()
+            elif(request.query_params['service'] == "jira"):
+                obj = api_token.objects.filter(service="jira").order_by('-updated_at').first()
                 token = obj.token
                 delta = timezone.now() - obj.updated_at
                 if((delta.total_seconds() / 3600) >= 1.0):

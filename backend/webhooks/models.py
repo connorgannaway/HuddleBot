@@ -39,11 +39,11 @@ class ticket_status_changes(models.Model):
         return self.jira_issue_key
     
 class api_token(models.Model):
-    class Type(models.TextChoices):
+    class Services(models.TextChoices):
         SLACK = "slack"
         JIRA = "jira"
 
-    token_type = models.CharField(max_length=5, choices=Type.choices)
+    service = models.CharField(max_length=5, choices=Services.choices)
     token = models.CharField(max_length=1350)
     refresh_token = models.CharField(max_length=100, null=True, blank=True)
     updated_at = models.DateTimeField(default=timezone.now)
