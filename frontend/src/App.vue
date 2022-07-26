@@ -1,15 +1,10 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import PersonForm from './components/PersonForm.vue'
+import {RouterLink, RouterView} from 'vue-router'
 </script>
 
 <template>
- 
-
   <main>
-    <div class="wrapper">
-      <PersonForm />
-    </div>
+    <RouterView />
   </main>
 </template>
 

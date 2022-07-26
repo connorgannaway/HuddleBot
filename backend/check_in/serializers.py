@@ -10,6 +10,7 @@ class Person_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Person
         fields = [
+            'pk',
             'first_name',
             'last_name',
             'slack_id',
@@ -26,11 +27,21 @@ class check_in_serializer(serializers.ModelSerializer):
     class Meta:
         model = check_in
         fields = [
+            'pk',
             'submitted_at',
             'feeling',
             'prior_work',
             'planned_work',
             'blockers',
             'user_id',
+            'date',
+            'uuid'
         ]
-    
+        extra_kwargs = {
+            "submitted_at": {"required": False},
+            "feeling": {"required": False},
+            "prior_work": {"required": False},
+            "planned_work": {"required": False},
+            "blockers": {"required": False},
+            "user_id": {"required": False},
+        }

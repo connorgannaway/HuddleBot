@@ -144,7 +144,7 @@
         </label>
         <input v-model="slack_id" />
 
-        <label>Jira ID
+        <label>Jira ID - 
             <button @click="findJiraMatch">Search</button> 
             <p v-if="jiramatchFound && jiraattemptMatch" class="success">Match Found</p> 
             <p v-if="jiraattemptMatch && !jiramatchFound" class="error">No Match Found</p>
