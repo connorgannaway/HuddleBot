@@ -49,8 +49,10 @@ onMounted(() => {
         <h1>UUID Needed</h1>
         <p>UUID either not provided or not found in the database.</p>
         <hr />
-        <input v-model="uuid" type="text" />
-        <button @click="updateUUID">Check UUID</button>
+        <div>
+            <input v-model="uuid" type="text" />
+            <button @click="updateUUID">Check UUID</button>
+        </div>
         <p v-if="retryUUID && validUUID == false" class="error">Invalid UUID</p>
         
     </div>
@@ -62,7 +64,11 @@ hr {
     margin: 10px 0 10px;
 }
 .error {
-        color: red;
-    }
+    color: red;
+}
+button {
+    margin-left: 10px;
+}
+
 
 </style>
