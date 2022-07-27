@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from .serializers import *
 from django.utils import timezone
 
+#/api/person/
 class PersonView(APIView):
 
     #create person in database
@@ -15,6 +16,7 @@ class PersonView(APIView):
             return Response(status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+#/api/check-in/uuid/
 class UUIDView(APIView):
     
     #get list of check-in uuids/user pairs based on date
@@ -56,6 +58,7 @@ class UUIDView(APIView):
 
         return Response(data=uuids, status=status.HTTP_201_CREATED)
 
+#/api/check-in/<str:uuid>/
 class CheckInView(APIView):
     
     def get(self, request, uuid, format=None):
@@ -77,3 +80,7 @@ class CheckInView(APIView):
                 return Response(status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+#/api/check-in/<str:uuid/ticketdata/
+class CheckInJiraDataView(APIView):
+    j = 1

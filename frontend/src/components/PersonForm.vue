@@ -1,5 +1,5 @@
 <script setup>
-    import {ref} from 'vue'
+    import {onMounted, ref} from 'vue'
     import axios from 'axios'
 
     const first_name = ref()
@@ -89,7 +89,7 @@
 
     function sumbitForm(e){
         e.preventDefault()
-        console.log(end_date.value)
+        
         if(end_date.value == ''){
             end_date.value = null
         }
@@ -120,9 +120,9 @@
     }
     
     
-    (() => {
+    onMounted(() => {
         getTokens()
-    })()
+    })
 
 </script>
 
