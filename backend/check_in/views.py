@@ -1,9 +1,10 @@
-from functools import partial
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import *
 from django.utils import timezone
+from webhooks.serializers import *
+from datetime import timedelta
 
 #/api/person/
 class PersonView(APIView):
@@ -62,7 +63,6 @@ class UUIDView(APIView):
 class CheckInView(APIView):
     
     def get(self, request, uuid, format=None):
-        #uuid = self.kwargs.get('uuid')
         try:
             obj = check_in.objects.get(uuid=uuid)
             data = check_in_serializer(obj).data
@@ -83,4 +83,52 @@ class CheckInView(APIView):
 
 #/api/check-in/<str:uuid/ticketdata/
 class CheckInJiraDataView(APIView):
-    j = 1
+    
+    def get(self, request, uuid, format=None):
+        try:
+            checkInObject = check_in.objects.get(uuid=uuid)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        uid = checkInObject.user
+
+        doneIssueTimeframeIDs = []
+        doneIssueIDs = []
+        testingIssueIDs = []
+        inProgressIssueIDs = []
+
+        #DONE
+        tickets = ticket_status_changes.objects.filter(new_status='done')
+        delta = timezone.now() - timedelta(days=1)
+        for ticket in tickets:
+            assignment = ticket_assignment.objects.filter(jira_issue_key=ticket.jira_issue_key).earliest('assigned_at')
+            if(assignment.assigned_to == uid):
+                doneIssueIDs.append(ticket.jira_issue_key)
+                
+        tickets = tickets.filter(updated_at__gt=delta)
+        for ticket in tickets:
+            if(ticket.jira_issue_key in doneIssueIDs):
+                doneIssueTimeframeIDs.append(ticket.jira_issue_key)
+
+        #TESTING
+        tickets = ticket_status_changes.objects.filter(new_status='testing')
+            
+        for ticket in tickets:
+            assignment = ticket_assignment.objects.filter(jira_issue_key=ticket.jira_issue_key).earliest('assigned_at')
+            if(assignment.assigned_to == uid and not ticket.jira_issue_key in doneIssueIDs):
+                testingIssueIDs.append(ticket.jira_issue_key)
+
+        #IN PROGRESS
+        tickets = ticket_status_changes.objects.filter(new_status='in_progress')
+            
+        for ticket in tickets:
+            assignment = ticket_assignment.objects.filter(jira_issue_key=ticket.jira_issue_key).earliest('assigned_at')
+            if(assignment.assigned_to == uid and not ticket.jira_issue_key in doneIssueIDs and not ticket.jira_issue_key in testingIssueIDs):
+                inProgressIssueIDs.append(ticket.jira_issue_key)
+
+        data = {
+            'in_progress': inProgressIssueIDs,
+            'testing': testingIssueIDs,
+            'done': doneIssueTimeframeIDs
+        }
+
+        return Response(data=data, status=status.HTTP_200_OK)

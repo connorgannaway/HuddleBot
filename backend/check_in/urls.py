@@ -21,4 +21,5 @@ urlpatterns = [
     path('api/person/', views.PersonView.as_view()),
     path('api/check-in/uuid/', views.UUIDView.as_view()),
     path('api/check-in/<str:uuid>/', views.CheckInView.as_view()),
+    path('api/check-in/<str:uuid>/ticketdata/', views.CheckInJiraDataView.as_view())
 ]

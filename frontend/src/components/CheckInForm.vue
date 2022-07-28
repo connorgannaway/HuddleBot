@@ -8,35 +8,8 @@
     const planned_work = ref()
     const blockers = ref()
 
-    let slack_token = ''
-    let jira_token = ''
-
     const route = useRoute()
     const postCode = ref()
-
-    
-    
-    function getTokens(){
-        axios.get(
-            'http://localhost:8000/api/token/?service=slack'
-        )
-        .then((res) => {
-            slack_token = res.data.token
-        })
-        .catch((err) => {
-            console.log(err)
-        })
-
-        axios.get(
-            'http://localhost:8000/api/token/?service=jira'
-        )
-        .then((res) => {
-            jira_token = res.data.token
-        })
-        .catch((err) => {
-            console.log(err)
-        })
-    }
 
     
 
@@ -66,9 +39,6 @@
     }
     
     
-    onMounted(() => {
-        //getTokens()
-    })
 
 </script>
 
@@ -94,7 +64,7 @@
 
 
         <button @click="sumbitForm">Submit</button>
-        <p v-if="postCode == 200" class="success">Object Created</p>
+        <p v-if="postCode == 200" class="success">Submitted</p>
         <p v-if="postCode == 400" class="error">Error.</p>
     </form>
 

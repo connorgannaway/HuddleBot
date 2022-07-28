@@ -24,4 +24,4 @@ coverage
 /cypress/videos/
 /cypress/screenshots/
 
-# E
+dist/

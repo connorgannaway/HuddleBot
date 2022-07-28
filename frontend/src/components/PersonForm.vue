@@ -40,20 +40,35 @@
         })
     }
 
-    function findSlackMatch(e){
-        e.preventDefault()
+    function findSlackMatch(next_cursor=null){
+       // e.preventDefault()
 
-        const body = `token=${slack_token}`
-
+        let body = `token=${slack_token}&limit=2`
+        if(next_cursor != null){
+            console.log("Courseer")
+            console.log(next_cursor)
+            body = body + `&cursor=${next_cursor}`
+        }
         axios.post('https://slack.com/api/users.list', body)
         .then((res) => {
+            console.log(res)
             let members = res.data.members
             for(const member of members){
                 if(member.real_name == `${first_name.value} ${last_name.value}`){
                     slack_id.value = member.id
                     slackmatchFound.value = true
                 }
-            }
+            } 
+            
+ //           if(slackmatchFound.value == false && res.data.response_metadata.next_cursor){
+   //             let cursor = res.data.response_metadata.next_cursor
+     //           for(let i = 0; i < cursor.length; i++){
+       //             if(cursor[i] == '='){
+         //               cursor.splice(i, 0, "%3D")
+           //         }
+             //   }
+               // findSlackMatch(e, )
+            //}
             slackattemptMatch.value = true
         })
         .catch((err) => {
@@ -138,7 +153,7 @@
         <label>Last Name</label>
         <input v-model="last_name" />
         <label>Slack ID - 
-            <button @click="findSlackMatch">Search</button> 
+            <button @click="findSlackMatch" @click.prevent="submit">Search</button> 
             <p v-if="slackmatchFound && slackattemptMatch" class="success">Match Found</p> 
             <p v-if="slackattemptMatch && !slackmatchFound" class="error">No Match Found</p>
         </label>

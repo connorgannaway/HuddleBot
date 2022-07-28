@@ -71,7 +71,7 @@ Build frontend
 
  A POST request with post data `create: True` will create check-in entries for all active users for the current date, and return the equivalent of the GET request. All fields are left null except `uuid`, `user`, and `date`. 
 
-*(Note: `date` contains the day the entry is for, and `submitted_at` is when the user submitted their form.)*
+*(Note: `date` contains the day the entry is for, and `submitted_at` is when the user actually submitted their form.) Fields are TZ-aware and in UTC. This can be changed in backend/backend/settings.py*
 
 **api/check-in/*str:uuid*/** interacts directly with the check-in entry matching the uuid in the url. A GET request will return the db entry, and a PATCH request will update the entry. `submitted_at` is autofilled on PATCH.
 
