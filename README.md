@@ -120,7 +120,7 @@ Create a slack app on [api.slack.com](https://api.slack.com) with `channels:join
 1. From [developer.atlassian.com](https://developer.atlassian.com), enter the developer console from the settings dropdown.
 2. Create an app using OAuth2
 3. Go to permissions and configure Jira API
-4. Add classic scopes read:jira-work, read:jira-user as scopes
+4. Add classic scopes `read:jira-work`, `read:jira-user` as scopes
 5. Go to authorization and configue OAuth2
 6. Set the callback url to any url, we are only doing this once.
 7. Copy the url generated and paste into a new tab
