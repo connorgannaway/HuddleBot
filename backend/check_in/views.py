@@ -17,6 +17,17 @@ class PersonView(APIView):
             return Response(status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+#/api/person/<int:pk>
+class PersonDetailView(APIView):
+    
+    def get(self, request, pk, format=None):
+        try:
+            obj = Person.objects.get(pk=pk)
+            serializer = Person_Serializer(instance=obj)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
 #/api/check-in/uuid/
 class UUIDView(APIView):
     

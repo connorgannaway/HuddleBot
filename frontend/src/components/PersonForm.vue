@@ -40,15 +40,44 @@
         })
     }
 
-    function findSlackMatch(next_cursor=null){
+    function findSlackMatch(){
        // e.preventDefault()
 
-        let body = `token=${slack_token}&limit=2`
-        if(next_cursor != null){
-            console.log("Courseer")
-            console.log(next_cursor)
-            body = body + `&cursor=${next_cursor}`
-        }
+        let body = `token=${slack_token}&limit=200`
+        axios.post('https://slack.com/api/users.list', body)
+        .then((res) => {
+            console.log(res)
+            let members = res.data.members
+            for(const member of members){
+                if(member.real_name == `${first_name.value} ${last_name.value}`){
+                    slack_id.value = member.id
+                    slackmatchFound.value = true
+                }
+            } 
+//            if(slackmatchFound.value == false && res.data.response_metadata.next_cursor){
+  //              let next = res.data.response_metadata.next_cursor
+    //            console.log(next)
+      //          let nextarr = next.split('')
+        //        for(let i = 0; i < nextarr.length; i++){
+          //          if(nextarr[i] == '='){
+            //            nextarr.splice(i, 0, "%3D")
+              //      }
+                //}
+        //        next = nextarr.join('')
+          //      getNextSlackPage(next)
+            //}
+
+            slackattemptMatch.value = true
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+    }
+
+    function getNextSlackPage(cursor){
+        let body = `token=${slack_token}&limit=2&cursor=${next_cursor}`
+        console.log(cursor)
+
         axios.post('https://slack.com/api/users.list', body)
         .then((res) => {
             console.log(res)
@@ -60,16 +89,17 @@
                 }
             } 
             
- //           if(slackmatchFound.value == false && res.data.response_metadata.next_cursor){
-   //             let cursor = res.data.response_metadata.next_cursor
-     //           for(let i = 0; i < cursor.length; i++){
-       //             if(cursor[i] == '='){
-         //               cursor.splice(i, 0, "%3D")
-           //         }
-             //   }
-               // findSlackMatch(e, )
-            //}
-            slackattemptMatch.value = true
+            if(slackmatchFound.value == false && res.data.response_metadata.next_cursor){
+                let cursor = res.data.response_metadata.next_cursor
+                let cursorarr = cursor.split('')
+                for(let i = 0; i < cursorarr.length; i++){
+                    if(cursorarr[i] == '='){
+                        cursorarr.splice(i, 0, "%3D")
+                    }
+                }
+                cursor = cursorarr.join('')
+                getNextSlackPage(cursor)
+            }
         })
         .catch((err) => {
             console.log(err)
@@ -88,7 +118,7 @@
         }
 
         axios.get(
-            'https://api.atlassian.com/ex/jira/473bc873-16c1-44d7-9376-97e8de5e755c/rest/api/3/users/search',
+            `https://api.atlassian.com/ex/jira/${import.meta.env.VITE_CLOUD_ID}/rest/api/3/users/search`,
             config
         )
         .then((res) => {

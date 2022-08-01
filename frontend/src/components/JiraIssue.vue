@@ -18,7 +18,7 @@ const description = ref()
 
 function fetchIssueData(){
     axios.get(
-        `https://api.atlassian.com/ex/jira/473bc873-16c1-44d7-9376-97e8de5e755c/rest/api/3/issue/${props.id}`,
+        `https://api.atlassian.com/ex/jira/${import.meta.env.VITE_CLOUD_ID}/rest/api/3/issue/${props.id}`,
         {headers: {
             Authorization: `Bearer ${props.jiratoken}`
         }}
