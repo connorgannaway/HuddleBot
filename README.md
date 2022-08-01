@@ -60,14 +60,17 @@ Build frontend
 ### Backend
 
     api/person/ - POST
+    api/person/<int:pk>/ - GET
     api/check-in/uuid/ - GET/POST 
-    api/check-in/<uuid>/ - GET/PATCH
+    api/check-in/<str:uuid>/ - GET/PATCH
     
     api/token/ - GET
     api/assignment/ - POST
     api/statuschange/ - POST
     
 **api/person/** is the endpoint to add a new person to the database.
+
+**api/person/*int:pk*/** will return person info for specified primary key
 
 **api/check-in/uuid/** deals with check-in uuids.
  A GET request with query param `date` will return a list of related `user` and `check_in_uuid` objects for that date.
