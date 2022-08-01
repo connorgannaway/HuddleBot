@@ -1,6 +1,7 @@
 # Quore Daily Check-ins
 Software to manage daily developer check-ins at Quore
 
+
 # Installation
 
 Python3/Node.js required. Clone the repository
@@ -18,6 +19,8 @@ From project root, create and activate a virtual environment.
 Install packages
 
     pip install -r requirements
+
+Copy `.env` file (contains secret key) to project root.
 
 Create database
 
@@ -96,10 +99,50 @@ All DB entries can be modified in the Django Admin site at the `admin/` endpoint
 4. Create another rule for the To Do to In Progress transition with *"Issue transitioned"* as the trigger. Set "From status" to *"To Do"* and the "To status" to *"In Progress"*.
 5. Set the action to *"Send web request"*.
 6. Set the web request URL to the **api/statuschange/** endpoint, and the body to *"Issue Data (Jira Format)"*.
-7. Set `old_status` and `new_status` headers to *"to_do"* and *"in_progress"*. Save.
+7. Set `old_status` and `new_status` query params (url) to *"to_do"* and *"in_progress"*. Save.
 8. Repeat 4-7 for the remaining issue transitions. *Note: all "in progress" and "testing" kanban categories should be grouped into one "in_progress" and "testing" status. e.g. there should not be a rule firing for an issue transitioning from one testing category to another.*
 
 To make development easier, you can easily create a tunnel for the backend server and set the web request urls to the other end of that tunnel using [ngrok](https://ngrok.com/download).
 
     ngrok http --host-header=rewrite <backendport>
+
+## OAuth Authentication & Bot Creation
+
+### Slack
+
+Create a slack app on [api.slack.com](https://api.slack.com) with `channels:join`, `chat:write`, `im:write`, `users:read` as bot scopes. Then, use the "Install App" page to install your slack app to your workspace. Copy your Bot User OAuth Token (starts with xoxb-) and enter it to the api_token database table (/admin).
+
+### Jira
+
+1. From [developer.atlassian.com](https://developer.atlassian.com), enter the developer console from the settings dropdown.
+2. Create an app using OAuth2
+3. Go to permissions and configure Jira API
+4. Add classic scopes read:jira-work, read:jira-user, write:jira-work as scopes
+5. Go to authorization and configue OAuth2
+6. Set the callback url to any url, we are only doing this once.
+7. Copy the url generated and paste into a new tab
+8. Change `state=${value}` to `state={a random string}`
+9. Add `%20offline_access` after the last scope, but before other parameters
+10. Hit enter and follow the prompts. When redirected, copy the Auth Code attached to the redirected url.
+
+**Exchange the authorization code for access token:**
+
+    curl --request POST \
+      --url 'https://auth.atlassian.com/oauth/token' \
+      --header 'Content-Type: application/json' \
+      --data '{"grant_type": "authorization_code","client_id": "YOUR_CLIENT_ID","client_secret": "YOUR_CLIENT_SECRET","code": "YOUR_AUTHORIZATION_CODE","redirect_uri": "https://YOUR_APP_CALLBACK_URL"}'
+
+- Save the access_token and refresh_token response in the api_token database table (/admin)
+- In the root of the project, add `JIRA_CLIENT` and `JIRA_SECRET` (found in Jira App Settings) to the `.env` file. You will not be able to regenerate access tokens without this.
+
+**Get the `cloudid` for your site**
+
+Using your current access token (only valid for 1hr), make the following request
+
+    curl --request GET \
+      --url https://api.atlassian.com/oauth/token/accessible-resources \
+      --header 'Authorization: Bearer ACCESS_TOKEN' \
+      --header 'Accept: application/json'
+
+Save the appropriate `id` response to your `.env` file as `JIRA_CLOUD_ID`
 
