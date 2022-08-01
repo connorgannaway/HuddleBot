@@ -20,7 +20,7 @@ Install packages
 
     pip install -r requirements
 
-Copy `.env` file (contains secret key) to project root.
+Copy `.env` file (contains secret key) to /backend.
 
 Create database
 
@@ -133,7 +133,7 @@ Create a slack app on [api.slack.com](https://api.slack.com) with `channels:join
       --data '{"grant_type": "authorization_code","client_id": "YOUR_CLIENT_ID","client_secret": "YOUR_CLIENT_SECRET","code": "YOUR_AUTHORIZATION_CODE","redirect_uri": "https://YOUR_APP_CALLBACK_URL"}'
 
 - Save the access_token and refresh_token response in the api_token database table (/admin)
-- In the root of the project, add `JIRA_CLIENT` and `JIRA_SECRET` (found in Jira App Settings) to the `.env` file. You will not be able to regenerate access tokens without this.
+- In `/backend`, add `JIRA_CLIENT` and `JIRA_SECRET` (found in Jira App Settings) to the `.env` file. You will not be able to regenerate access tokens without this.
 
 **Get the `cloudid` for your site**
 
@@ -144,5 +144,5 @@ Using your current access token (only valid for 1hr), make the following request
       --header 'Authorization: Bearer ACCESS_TOKEN' \
       --header 'Accept: application/json'
 
-Save the appropriate `id` response to your `.env` file as `JIRA_CLOUD_ID`
+Copy the appropriate `id` response. Save this as `VITE_CLOUD_ID` in a new `.env` file located in `/frontend`.
 
