@@ -12,7 +12,7 @@
     const postCode = ref()
 
     
-
+    //format form data and submit to backend api
     function sumbitForm(e){
         e.preventDefault()
         
@@ -23,7 +23,6 @@
             blockers: blockers.value,
         }
     
-
         axios.patch(
             'http://localhost:8000/api/check-in/' + route.query.uuid + '/',
             params

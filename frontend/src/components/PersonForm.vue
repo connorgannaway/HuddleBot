@@ -17,7 +17,7 @@
     const jiraattemptMatch = ref(false)
     const postCode = ref()
 
-    
+    //get updated api tokens from backend
     function getTokens(){
         axios.get(
             'http://localhost:8000/api/token/?service=slack'
@@ -40,32 +40,22 @@
         })
     }
 
-    function findSlackMatch(){
-       // e.preventDefault()
+    //attempt to find id match from slack api
+    function findSlackMatch(e){
+       e.preventDefault()
 
         let body = `token=${slack_token}&limit=200`
         axios.post('https://slack.com/api/users.list', body)
         .then((res) => {
             console.log(res)
             let members = res.data.members
+            //for each member, update fields if real name matches first + last name
             for(const member of members){
                 if(member.real_name == `${first_name.value} ${last_name.value}`){
                     slack_id.value = member.id
                     slackmatchFound.value = true
                 }
             } 
-//            if(slackmatchFound.value == false && res.data.response_metadata.next_cursor){
-  //              let next = res.data.response_metadata.next_cursor
-    //            console.log(next)
-      //          let nextarr = next.split('')
-        //        for(let i = 0; i < nextarr.length; i++){
-          //          if(nextarr[i] == '='){
-            //            nextarr.splice(i, 0, "%3D")
-              //      }
-                //}
-        //        next = nextarr.join('')
-          //      getNextSlackPage(next)
-            //}
 
             slackattemptMatch.value = true
         })
@@ -74,6 +64,7 @@
         })
     }
 
+    //pagination testing
     function getNextSlackPage(cursor){
         let body = `token=${slack_token}&limit=2&cursor=${next_cursor}`
         console.log(cursor)
@@ -106,6 +97,7 @@
         })
     }
 
+    //attempt to find id match from jira api
     function findJiraMatch(e){
         e.preventDefault()
         let config = {
@@ -122,6 +114,7 @@
             config
         )
         .then((res) => {
+            //for each user, update fields if displayName matches First + Last name
             for(const user of res.data){
                 if(user.displayName == `${first_name.value} ${last_name.value}`){
                     jiramatchFound.value = true
@@ -132,6 +125,7 @@
         })
     }
 
+    //format data and submit to backend
     function sumbitForm(e){
         e.preventDefault()
         
@@ -183,7 +177,7 @@
         <label>Last Name</label>
         <input v-model="last_name" />
         <label>Slack ID - 
-            <button @click="findSlackMatch" @click.prevent="submit">Search</button> 
+            <button @click="findSlackMatch" >Search</button> 
             <p v-if="slackmatchFound && slackattemptMatch" class="success">Match Found</p> 
             <p v-if="slackattemptMatch && !slackmatchFound" class="error">No Match Found</p>
         </label>

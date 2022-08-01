@@ -14,6 +14,8 @@ const testingIDs = ref([])
 const doneIDs = ref([])
 const jiratoken = ref()
 
+//check if uuid is a valid uuid from database. Form & issues will only load
+//if the uuid is valid
 function checkUUID(){
     if(uuid.value){
         axios.get(
@@ -47,12 +49,14 @@ function getToken(){
     })
 }
 
+//handle checkUUID button press
 function updateUUID(){
     route.query.uuid = uuid.value
     checkUUID()
     retryUUID.value = true
 }
 
+//get uuid's related tickets. sort by status for display
 function fetchTicketIDs(){
     axios.get(
         `http://localhost:8000/api/check-in/${uuid.value}/ticketdata/`
@@ -84,6 +88,7 @@ onMounted(() => {
 </script>
 
 <template>
+    <!--IF UUID IS VALID-->
     <div v-if="validUUID">
         <CheckInForm />
 
@@ -102,6 +107,8 @@ onMounted(() => {
             <JiraIssue :id="ticket.issuekey" :jiratoken="jiratoken" />
         </div>
     </div>
+    
+    <!--UUID IS NOT VALID-->
     <div v-else>
         <h1>UUID Needed</h1>
         <p>UUID either not provided or not found in the database.</p>

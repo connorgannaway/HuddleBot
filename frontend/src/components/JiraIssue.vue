@@ -15,7 +15,7 @@ const link = ref()
 const issuetype = ref()
 const description = ref()
 
-
+//fetch jira issue data using passed id and token vars
 function fetchIssueData(){
     axios.get(
         `https://api.atlassian.com/ex/jira/${import.meta.env.VITE_CLOUD_ID}/rest/api/3/issue/${props.id}`,
@@ -33,6 +33,7 @@ function fetchIssueData(){
     })
 }
 
+//split response data into variables for easy access
 function splitData(){
     summary.value = issue.fields.summary
     link.value = `https://cgannaway.atlassian.net/browse/${props.id}`
@@ -46,17 +47,14 @@ function splitData(){
     }
     catch{}
 
-    
-
     callSuccess.value = true
 
 }
 
+//open issue in new tab
 function openIssue(){
     window.open(link.value)
 }
-
-
 
 onMounted(() => {
     fetchIssueData()

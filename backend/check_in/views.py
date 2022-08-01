@@ -6,6 +6,14 @@ from django.utils import timezone
 from webhooks.serializers import *
 from datetime import timedelta
 
+'''
+views.py contains all logic that runs on a endpoint request.
+
+Each class is a different endpoint defined in urls.py, and the member
+methods contain the logic for the type of request. If a request type is
+not defined, it is not allowed.
+'''
+
 #/api/person/
 class PersonView(APIView):
 
@@ -54,15 +62,19 @@ class UUIDView(APIView):
             return Response(status=status.HTTP_200_OK)
         
         persons = Person.objects.all()
-        uuids = []
+        uuids = [] #list of pairs to return
+
+        #for each active user, create entry for that user
         for person in persons:
             if(person.is_active == False):
                 continue
+
             data = {
                 'user': person,
             }
             obj = check_in(**data)
             obj.save()
+
             uuids.append({
                 "user": person.pk,
                 "check_in_uuid": obj.uuid
@@ -73,6 +85,7 @@ class UUIDView(APIView):
 #/api/check-in/<str:uuid>/
 class CheckInView(APIView):
     
+    #get check in entry data for specified uuid
     def get(self, request, uuid, format=None):
         try:
             obj = check_in.objects.get(uuid=uuid)
@@ -81,6 +94,7 @@ class CheckInView(APIView):
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+    #update check in entry data for specified uuid
     def patch(self, request, uuid, format=None):
         try:
             obj = check_in.objects.get(uuid=uuid)
@@ -95,6 +109,7 @@ class CheckInView(APIView):
 #/api/check-in/<str:uuid/ticketdata/
 class CheckInJiraDataView(APIView):
     
+    #get inProgress, testing, and done ticket info for uuid
     def get(self, request, uuid, format=None):
         try:
             checkInObject = check_in.objects.get(uuid=uuid)
@@ -107,14 +122,23 @@ class CheckInJiraDataView(APIView):
         testingIssueIDs = []
         inProgressIssueIDs = []
 
+        '''
+        for each ticket status, get all tickets that have that status.
+            if ticket assignment table reflects the check-in user,
+                add that ticket id to the list
+        '''
+
         #DONE
         tickets = ticket_status_changes.objects.filter(new_status='done')
-        delta = timezone.now() - timedelta(days=1)
+        
         for ticket in tickets:
             assignment = ticket_assignment.objects.filter(jira_issue_key=ticket.jira_issue_key).earliest('assigned_at')
             if(assignment.assigned_to == uid):
                 doneIssueIDs.append(ticket.jira_issue_key)
-                
+
+        #create a new list with only the recently completed ticket keys
+        # this one will be returned
+        delta = timezone.now() - timedelta(days=1)        
         tickets = tickets.filter(updated_at__gt=delta)
         for ticket in tickets:
             if(ticket.jira_issue_key in doneIssueIDs):
@@ -136,10 +160,10 @@ class CheckInJiraDataView(APIView):
             if(assignment.assigned_to == uid and not ticket.jira_issue_key in doneIssueIDs and not ticket.jira_issue_key in testingIssueIDs):
                 inProgressIssueIDs.append(ticket.jira_issue_key)
 
+        #format data and return
         data = {
             'in_progress': inProgressIssueIDs,
             'testing': testingIssueIDs,
             'done': doneIssueTimeframeIDs
         }
-
         return Response(data=data, status=status.HTTP_200_OK)

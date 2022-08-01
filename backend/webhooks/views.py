@@ -6,6 +6,7 @@ from django.utils import timezone
 import os
 import requests
 
+#api/statuschange/
 class StatusChangeView(APIView):
 
     #saves a statuschange entry to db
@@ -23,6 +24,7 @@ class StatusChangeView(APIView):
             print('Improper Formatting')
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+        #save data if valid
         serializer = ticket_status_changes_serializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -40,7 +42,7 @@ class StatusChangeView(APIView):
     '''
   
 
-
+#api/assignment/
 class AssignmentView(APIView):
 
     #saves an assignment entry to db
@@ -67,6 +69,7 @@ class AssignmentView(APIView):
             print('Improper Formatting')
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+        #save data if valid
         serializer = ticket_assignment_serializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -82,8 +85,10 @@ class AssignmentView(APIView):
         return Response(serializer.data)
     '''
 
+#api/token/
 class TokenView(APIView):
-
+    
+    #return new JIRA oauth token from refresh token
     def refreshOauthToken(self, refresh_token):
         print("REFRESHING OAUTH TOKEN")
         headers = {'Content_Type': 'application/json'}
@@ -97,6 +102,8 @@ class TokenView(APIView):
         res = requests.post('https://auth.atlassian.com/oauth/token',
             data=data,
             headers=headers)
+
+        #save new access and refresh tokens to db
         data = {
             'service': 'jira',
             'token': res.json()['access_token'],
@@ -106,9 +113,12 @@ class TokenView(APIView):
         newtoken.save()
         return data['token']
 
+    #return current access token
     def get(self, request, format=None):
         try:
             if(request.query_params['service'] == "slack"):
+
+                #get newest slack token
                 obj = api_token.objects.filter(service="slack").order_by('-updated_at').first()
                 data = {
                     "token": obj.token
@@ -116,11 +126,14 @@ class TokenView(APIView):
                 return Response(data=data, status=status.HTTP_200_OK)
 
             elif(request.query_params['service'] == "jira"):
+
+                #get newest jira token
                 obj = api_token.objects.filter(service="jira").order_by('-updated_at').first()
                 token = obj.token
+
+                #if token is more than an hour old, refresh
                 delta = timezone.now() - obj.updated_at
                 if((delta.total_seconds() / 3600) >= 1.0):
-                    #refresh token
                     token = self.refreshOauthToken(obj.refresh_token)
 
                 data = {
