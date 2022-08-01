@@ -122,8 +122,8 @@ Create a slack app on [api.slack.com](https://api.slack.com) with `channels:join
 3. Go to permissions and configure Jira API
 4. Add classic scopes `read:jira-work`, `read:jira-user` as scopes
 5. Go to authorization and configue OAuth2
-6. Set the callback url to any url, we are only doing this once.
-7. Copy the url generated and paste into a new tab
+6. Set the callback url to any url. This is only used to grab url params when redirected.
+7. Copy the generated url and paste into a new tab
 8. Change `state=${value}` to `state={a random string}`
 9. Add `%20offline_access` after the last scope, but before other parameters
 10. Hit enter and follow the prompts. When redirected, copy the Auth Code attached to the redirected url.
