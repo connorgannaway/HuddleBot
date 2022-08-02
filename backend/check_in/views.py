@@ -124,7 +124,7 @@ class CheckInJiraDataView(APIView):
 
         '''
         for each ticket status, get all tickets that have that status.
-            if ticket assignment table reflects the check-in user,
+            if ticket assignment table reflects the check-in user and ticket status is current,
                 add that ticket id to the list
         '''
 
@@ -138,7 +138,7 @@ class CheckInJiraDataView(APIView):
 
         #create a new list with only the recently completed ticket keys
         # this one will be returned
-        delta = timezone.now() - timedelta(days=1)        
+        delta = checkInObject.date - timedelta(days=1)        
         tickets = tickets.filter(updated_at__gt=delta)
         for ticket in tickets:
             if(ticket.jira_issue_key in doneIssueIDs):

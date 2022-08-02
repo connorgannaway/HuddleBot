@@ -24,7 +24,7 @@ function fetchIssueData(){
         }}
     )
     .then((res) => {
-        console.log(res.data)
+        //console.log(res.data)
         issue = res.data
         splitData()
     })
@@ -102,14 +102,14 @@ onMounted(() => {
     margin-bottom: 20px;
 }
 .statusicon {
-    height: 15px;
+    height: 20px;
     line-height: 15px;
+    text-align: left;
+    margin: auto;
+    
 }
 .statusicon img{
     margin-right: 10px;
-}
-.title {
-
 }
 .desc {
     margin-bottom: 15px;

@@ -13,6 +13,7 @@ const inProgressIDs = ref([])
 const testingIDs = ref([])
 const doneIDs = ref([])
 const jiratoken = ref()
+const formData = ref()
 
 //check if uuid is a valid uuid from database. Form & issues will only load
 //if the uuid is valid
@@ -23,6 +24,8 @@ function checkUUID(){
         )
         .then((res) => {
             if(res.status == 200){
+                formData.value = res.data
+                //console.log(res.data)
                 validUUID.value = true
                 fetchTicketIDs()
             }
@@ -62,7 +65,7 @@ function fetchTicketIDs(){
         `http://localhost:8000/api/check-in/${uuid.value}/ticketdata/`
     )
     .then((res) => {
-        console.log(res)
+        //console.log(res)
 
         for(const ticket of res.data.in_progress){
             inProgressIDs.value.push({issuekey: ticket})
@@ -90,21 +93,26 @@ onMounted(() => {
 <template>
     <!--IF UUID IS VALID-->
     <div v-if="validUUID">
-        <CheckInForm />
-
-        <h1>Tickets In Progress</h1>
-        <div v-for="ticket in inProgressIDs">
-            <JiraIssue :id="ticket.issuekey" :jiratoken="jiratoken" />
-        </div>
-
-        <h1>Tickets In Testing</h1>
-        <div v-for="ticket in testingIDs">
-            <JiraIssue :id="ticket.issuekey" :jiratoken="jiratoken" />
-        </div>
-
-        <h1>Recently Completed Tickets</h1>
-        <div v-for="ticket in doneIDs">
-            <JiraIssue :id="ticket.issuekey" :jiratoken="jiratoken" />
+        <div class="row">
+            <div class="column">
+                <CheckInForm :inProgress="inProgressIDs" :testing="testingIDs" :done="doneIDs" />
+            </div>
+            <div class="column">
+                <h1>Tickets In Progress</h1>
+                <div v-for="ticket in inProgressIDs">
+                    <JiraIssue :id="ticket.issuekey" :jiratoken="jiratoken" />
+                </div>
+        
+                <h1>Tickets In Testing</h1>
+                <div v-for="ticket in testingIDs">
+                    <JiraIssue :id="ticket.issuekey" :jiratoken="jiratoken" />
+                </div>
+        
+                <h1>Recently Completed Tickets</h1>
+                <div v-for="ticket in doneIDs">
+                    <JiraIssue :id="ticket.issuekey" :jiratoken="jiratoken" />
+                </div>
+            </div>
         </div>
     </div>
     
@@ -132,6 +140,19 @@ hr {
 }
 button {
     margin-left: 10px;
+}
+
+
+@media (min-width: 1024px) {
+    .row {
+        display: flex;
+        justify-content: center;
+    }
+
+    .column {
+        padding: 1em;
+        width: 50%;
+    }
 }
 
 
