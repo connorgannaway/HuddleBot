@@ -15,8 +15,8 @@ const doneIDs = ref([])
 const jiratoken = ref()
 const formData = ref()
 
-//check if uuid is a valid uuid from database. Form & issues will only load
-//if the uuid is valid
+//check if uuid is a valid uuid from database. Form & issues 
+//will only load if the uuid is valid
 function checkUUID(){
     if(uuid.value){
         axios.get(
@@ -40,6 +40,7 @@ function checkUUID(){
     }
 }
 
+//get updated jira token to pass to child components
 function getToken(){
     axios.get(
         'http://localhost:8000/api/token/?service=jira'

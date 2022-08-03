@@ -22,6 +22,7 @@
     function sumbitForm(e){
         e.preventDefault()
 
+        //create single string from selected tickets & typed text
         let plannedIDs = JSON.stringify(
             filterCheckboxes(props.inProgress)
         )
@@ -30,7 +31,6 @@
                 props.testing.concat(props.done)
             )
         )
-        
         let prior_work_string = priorIDs.concat(' ', prior_work.value)
         let planned_work_string = plannedIDs.concat(' ', planned_work.value)
         

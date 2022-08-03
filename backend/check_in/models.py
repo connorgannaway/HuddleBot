@@ -28,10 +28,10 @@ class check_in(models.Model):
 
     #fields are null when entry is created, non-null after form submission (PATCH)
     submitted_at = models.DateTimeField(blank=True, null=True)
-    feeling = models.CharField(max_length=150, blank=True, null=True)
-    prior_work = models.CharField(max_length=150, blank=True, null=True)
-    planned_work = models.CharField(max_length=150, blank=True, null=True)
-    blockers = models.CharField(max_length=150, blank=True, null=True)
+    feeling = models.CharField(max_length=200, blank=True, null=True)
+    prior_work = models.CharField(max_length=250, blank=True, null=True)
+    planned_work = models.CharField(max_length=250, blank=True, null=True)
+    blockers = models.CharField(max_length=200, blank=True, null=True)
 
     #sets to null if reference is deleted
     user = models.ForeignKey(Person, on_delete=models.SET_NULL, blank=True, null=True)
