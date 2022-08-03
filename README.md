@@ -25,11 +25,19 @@ Copy `.env` file (contains secret key) to /backend.
 Create database
 
     cd backend
-    python manage.py migrate
+    backend/> python manage.py migrate
 
 Run backend server
 
-    python manage.py runserver
+    backend/> python manage.py runserver
+
+### Note for deployment:
+
+**[backend/backend/settings.py]**: *CORS_ALLOWED_ORIGINS will need the frontend webserver address added. ALLOWED_HOSTS will need the backend url path added. DEBUG needs to be set to false. DATABASES will need to be changed for non-sqlite3 applications.* [MORE INFO](https://docs.djangoproject.com/en/4.0/howto/deployment/)
+
+To run:
+
+    backend/> gunicorn backend.wsgi
 
 ## Frontend
 
