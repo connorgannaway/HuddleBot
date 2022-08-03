@@ -33,7 +33,7 @@ Run backend server
 
 ### Note for deployment:
 
-**[backend/backend/settings.py]**: *CORS_ALLOWED_ORIGINS will need the frontend webserver address added. ALLOWED_HOSTS will need the backend url path added. DEBUG needs to be set to false. DATABASES will need to be changed for non-sqlite3 applications*
+**[backend/backend/settings.py]**: *CORS_ALLOWED_ORIGINS will need the frontend webserver address added. ALLOWED_HOSTS will need the backend url path added. DEBUG needs to be set to false. DATABASES will need to be changed for non-sqlite3 applications.* [MORE INFO](https://docs.djangoproject.com/en/4.0/howto/deployment/)
 
 To run:
 
