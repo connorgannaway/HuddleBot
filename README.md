@@ -6,8 +6,8 @@ Software to manage daily developer check-ins at Quore
 
 Python3/Node.js required. Clone the repository
 
-	git clone https://github.com/connorgannaway/JiraAutomation
-	cd JiraAutomation
+	git clone https://github.com/connorgannaway/HuddleBot
+	cd HuddleBot
 
 ## Backend
 
